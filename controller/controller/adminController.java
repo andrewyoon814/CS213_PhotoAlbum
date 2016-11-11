@@ -25,6 +25,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
+import model.User;
 
 /**
  * Admin controller takes care of all the admin screen based actions.
@@ -91,20 +92,20 @@ public class adminController {
 		
 		//de-serialize the data and populate users list
 		
-		File file = new File("model/users.txt");
+		File file = new File("data/users.txt");
 		
 		if(file.exists()){
 			try {
 		         FileInputStream fileIn = new FileInputStream(file);
 		         ObjectInputStream in = new ObjectInputStream(fileIn);
-		         ArrayList<String> deserArr = (ArrayList<String>) in.readObject();
+		         ArrayList<User> deserArr = (ArrayList<User>) in.readObject();
 		         in.close();
 		         fileIn.close();
 		         
 		         int count = 0;
 		 		
 		 		while(count < deserArr.size()){
-		 			users.add(deserArr.get(count));
+		 			users.add(deserArr.get(count).getName());
 		 			count++;
 		 		}
 		 		
@@ -140,14 +141,17 @@ public class adminController {
 	      //Where you serialize the data
 	      //creates an array of strings with all names so that it can be serialized
 			try {
-				FileOutputStream outfile = new FileOutputStream("model/users.txt");
+				FileOutputStream outfile = new FileOutputStream("data/users.txt");
 				ObjectOutputStream outStream = new ObjectOutputStream(outfile);
 				
 				int count = 0;
-				ArrayList<String> serList = new ArrayList<>();
+				ArrayList<User> serList = new ArrayList<>();
+
+				//iterate through userList and add to serArray in order to serialize and save state.
 				while(count < users.size()){
 					
-					serList.add(users.get(count));
+					User tmpUser = new User(users.get(count));
+					serList.add(tmpUser);
 					count++;
 				}
 				
@@ -226,14 +230,16 @@ public class adminController {
 				
 				//creates an array of strings with all names so that it can be serialized
 				try {
-					FileOutputStream outfile = new FileOutputStream("model/users.txt");
+					FileOutputStream outfile = new FileOutputStream("data/users.txt");
 					ObjectOutputStream outStream = new ObjectOutputStream(outfile);
 					
 					int count = 0;
-					ArrayList<String> serList = new ArrayList<>();
+					ArrayList<User> serList = new ArrayList<>();
+					
+					//populate serList to save state
 					while(count < users.size()){
-						
-						serList.add(users.get(count));
+						User newUser = new User(users.get(count));
+						serList.add(newUser);
 						count++;
 					}
 					
@@ -247,6 +253,7 @@ public class adminController {
 					e.printStackTrace();
 				}
    		 	}
+   		 	
     	}else{
     		
     		// Show the confirmation message.
