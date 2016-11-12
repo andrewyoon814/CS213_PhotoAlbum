@@ -1,23 +1,30 @@
 package controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import model.User;
 
 public class homeController {
 	
 	@FXML ScrollPane mainPane;
+	@FXML VBox albumVbox;
 	@FXML Label welcome;
 	private User session;
 	
@@ -30,25 +37,53 @@ public class homeController {
 	 */
 	public void homeSetup(User session){
 		
+		mainPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+		mainPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); 
+		
 		//sets session state
 		this. session = session;	
 		welcome.setText("Welcome " + session.getName() + "!");
 		
+		//iterate through all albums
 		int albumCount = 0;
 		while(albumCount < session.getAlbums().size()){
 			
-			System.out.println(session.getAlbums().get(albumCount).getName());
+			//Create an hbox that 
+			HBox albumHbox = new HBox();
+			albumHbox.setPadding(new Insets(15, 12, 15, 12));
+			albumHbox.setSpacing(10);
 			
-			int photocount = 0;
+			//create image view for image
+			File file = new File(session.getAlbums().get(albumCount).getPhotos().get(0).getPath());
+			Image img;
+			ImageView iView = new ImageView();
 			
-			while(photocount < session.getAlbums().get(albumCount).getPhotos().size()){
+			try {
+			
+				img = new Image(file.toURI().toURL().toExternalForm());
+				iView.setImage(img);
 				
-				System.out.println(session.getAlbums().get(albumCount).getPhotos().get(photocount).getName());
-				
-				photocount++;
+			} catch (MalformedURLException e) {
+
+				e.printStackTrace();
 			}
-			System.out.println("");
+			
+			iView.setFitHeight(100);
+			iView.setFitWidth(100);
+			iView.setPreserveRatio(true);
+			
+			albumHbox.getChildren().add(iView);
+			
+			//Create a button for renaming the album
+			Button renameAlbum = new Button("RENAME ALBUM");
+			albumHbox.getChildren().add(renameAlbum);
+			
+			//Create a button for deleting the album
+			Button deleteAlbum = new Button("DELETE ALBUM");
+			albumHbox.getChildren().add(deleteAlbum);
 			albumCount++;
+			
+			albumVbox.getChildren().add(albumHbox);
 		}
 
 	

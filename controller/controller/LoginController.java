@@ -73,6 +73,7 @@ public class LoginController {
 			
 			//read in the serialized data and setup the userlist.
 			File file = new File("data/users.txt");
+			boolean found = false;
 			
 			if(file.exists()){
 				try {
@@ -87,10 +88,10 @@ public class LoginController {
 			         i.printStackTrace();
 			         return;
 			      }
-			}
+			
 			
 			int count = 0;
-			boolean found = false;
+			
 			
 			//go through deserialized array to see if it contains a user with the given username
 			while(count < deserArr.size()){
@@ -114,6 +115,7 @@ public class LoginController {
 				}
 				
 				count++;
+			}
 			}
 			
 			if( found == false){

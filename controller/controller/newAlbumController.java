@@ -24,6 +24,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -42,6 +43,7 @@ public class newAlbumController {
 	@FXML ScrollPane photoPane;
 	@FXML TilePane photoTile;
 	@FXML TextField albumNameField;
+
 	
 	private User session;
 	private ArrayList<Photo> photos = new ArrayList<Photo>();
@@ -64,6 +66,7 @@ public class newAlbumController {
 		photoTile.setHgap(25);
 		photoTile.setVgap(40);
 	}
+
 	
 	/**
 	 * 
@@ -134,21 +137,23 @@ public class newAlbumController {
         // Show the dialog and wait until the user closes it
         dialogStage.showAndWait();
         
-        //get changes made by user
-        newPhoto = dialogController.getPhoto();
-        
-        //add to arraylist of photos
-		photos.add(newPhoto);
-
-		//create image from the filepath.
-		Image image = new Image(img.toURI().toURL().toExternalForm());
-		ImageView iView = new ImageView(image);
-		iView.setFitHeight(300);
-		iView.setFitWidth(300);
-		iView.setPreserveRatio(true);
-		
+        if(!dialogController.getDeleted()){
+	        //get changes made by user
+	        newPhoto = dialogController.getPhoto();
+	        
+	        //add to arraylist of photos
+			photos.add(newPhoto);
 	
-		photoTile.getChildren().add(iView);
+			//create image from the filepath.
+			Image image = new Image(img.toURI().toURL().toExternalForm());
+			ImageView iView = new ImageView(image);
+			iView.setFitHeight(300);
+			iView.setFitWidth(300);
+			iView.setPreserveRatio(true);
+			
+		
+			photoTile.getChildren().add(iView);
+        }
 
 	}
 	
@@ -181,11 +186,14 @@ public class newAlbumController {
 	@SuppressWarnings("unchecked")
 	@FXML public void createHandler(ActionEvent event) throws IOException{
 		
+		boolean correctName = true;
+		
 		String albumName = albumNameField.getText();
 
 		//check if album name is empty and force a name
 		if(albumName.equals("")){
 			
+			correctName = false;
 			//show the error message.
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Creation Error");
@@ -240,7 +248,7 @@ public class newAlbumController {
 							alert.setContentText("Album with same name exists! Please make new one!");
 							alert.showAndWait();
 							
-							break;
+							correctName = false;
 						}
 						
 						albumCount++;
@@ -252,54 +260,56 @@ public class newAlbumController {
 			userCount++;
 		}
 		
-		//if we go here, no problems. Continue to serialize the data.
+		//if we go here and correctName != false, no problems. Continue to serialize the data.
 		
-		Album album = new Album(albumName, photos);
-		
-		userCount = 0;
-		
-		//find current user and add the new album to the album list
-		while(userCount < deserArr.size()){
+		if(correctName != false){
+			Album album = new Album(albumName, photos);
 			
-			if(deserArr.get(userCount).getName().equals(session.getName())){
-				deserArr.get(userCount).addAlbum(album);
-				session = deserArr.get(userCount);
+			userCount = 0;
+			
+			//find current user and add the new album to the album list
+			while(userCount < deserArr.size()){
+				
+				if(deserArr.get(userCount).getName().equals(session.getName())){
+					deserArr.get(userCount).addAlbum(album);
+					session = deserArr.get(userCount);
+				}
+				
+				userCount++;
 			}
 			
-			userCount++;
-		}
-		
-		//serialize the new data
-		try {
-			FileOutputStream outfile = new FileOutputStream("data/users.txt");
-			ObjectOutputStream outStream = new ObjectOutputStream(outfile);
-		
-			//write the previously deserialized array
-			outStream.writeObject(deserArr);
+			//serialize the new data
+			try {
+				FileOutputStream outfile = new FileOutputStream("data/users.txt");
+				ObjectOutputStream outStream = new ObjectOutputStream(outfile);
 			
-			outfile.close();
-			outStream.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+				//write the previously deserialized array
+				outStream.writeObject(deserArr);
+				
+				outfile.close();
+				outStream.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			
+			//set fxmlloader and redirect to home
+			Parent root = null;
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("../view/home.fxml"));
+			root = loader.load();
+			homeController homeController = loader.getController();
+			
+			homeController.homeSetup(session);
+			
+			Scene scene = new Scene(root);
+	        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+	        
+	        stage.setScene(scene);
+	        stage.show();
 		}
-		
-		
-		//set fxmlloader and redirect to home
-		Parent root = null;
-		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(getClass().getResource("../view/home.fxml"));
-		root = loader.load();
-		homeController homeController = loader.getController();
-		
-		homeController.homeSetup(session);
-		
-		Scene scene = new Scene(root);
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        
-        stage.setScene(scene);
-        stage.show();
 			
 	
 	}

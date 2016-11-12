@@ -43,6 +43,5 @@
             <TilePane fx:id="photoTile" prefHeight="702.0" prefWidth="1000.0" />
          </content>
       </ScrollPane>
-      <Label layoutX="126.0" layoutY="140.0" prefHeight="21.0" prefWidth="230.0" text="Click Image to make changes!" />
    </children>
 </AnchorPane>

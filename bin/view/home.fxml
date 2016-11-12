@@ -36,6 +36,9 @@
             <Font size="37.0" />
          </font>
       </Label>
-      <ScrollPane fx:id="mainPane" layoutX="-1.0" layoutY="59.0" prefHeight="733.0" prefWidth="1014.0" />
+      <ScrollPane fx:id="mainPane" layoutX="-1.0" layoutY="59.0" prefHeight="733.0" prefWidth="1014.0">
+         <content>
+            <VBox fx:id="albumVbox" prefHeight="732.0" prefWidth="990.0" />
+         </content></ScrollPane>
    </children>
 </AnchorPane>

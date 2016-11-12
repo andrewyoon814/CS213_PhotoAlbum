@@ -41,6 +41,8 @@ public class adminController {
 	 * @param users
 	 * @param userList
 	 */
+	
+	private ArrayList<User> userData;
 	public ObservableList<String> users;
 	@FXML ListView<String> userList;
 	@FXML TextField userAdd;
@@ -98,7 +100,8 @@ public class adminController {
 			try {
 		         FileInputStream fileIn = new FileInputStream(file);
 		         ObjectInputStream in = new ObjectInputStream(fileIn);
-		         ArrayList<User> deserArr = (ArrayList<User>) in.readObject();
+		         this.userData = (ArrayList<User>) in.readObject();
+		         ArrayList<User> deserArr = this.userData;
 		         in.close();
 		         fileIn.close();
 		         
@@ -113,6 +116,8 @@ public class adminController {
 		         i.printStackTrace();
 		         return;
 		      }
+		}else{
+			userData = new ArrayList<User>();
 		}
         
 	}
@@ -136,7 +141,9 @@ public class adminController {
         
 	    	//this gets the index of the currently selected item and removes it
 	        int index = tmpList.indexOf(userList.getSelectionModel().getSelectedItem());
+	        String username = users.get(index);
 	        users.remove(index);
+	       
 	        
 	      //Where you serialize the data
 	      //creates an array of strings with all names so that it can be serialized
@@ -145,17 +152,18 @@ public class adminController {
 				ObjectOutputStream outStream = new ObjectOutputStream(outfile);
 				
 				int count = 0;
-				ArrayList<User> serList = new ArrayList<>();
+				//ArrayList<User> serList = new ArrayList<>();
 
 				//iterate through userList and add to serArray in order to serialize and save state.
-				while(count < users.size()){
+				while(count < this.userData.size()){
 					
-					User tmpUser = new User(users.get(count));
-					serList.add(tmpUser);
+					if(this.userData.get(count).getName().equals(username)){
+						this.userData.remove(count);
+					}
 					count++;
 				}
 				
-				outStream.writeObject(serList);
+				outStream.writeObject(this.userData);
 				
 				outfile.close();
 				outStream.close();
@@ -232,7 +240,7 @@ public class adminController {
 				try {
 					FileOutputStream outfile = new FileOutputStream("data/users.txt");
 					ObjectOutputStream outStream = new ObjectOutputStream(outfile);
-					
+					/*
 					int count = 0;
 					ArrayList<User> serList = new ArrayList<>();
 					
@@ -241,9 +249,13 @@ public class adminController {
 						User newUser = new User(users.get(count));
 						serList.add(newUser);
 						count++;
-					}
+					}*/
 					
-					outStream.writeObject(serList);
+					User newUser = new User(add);
+					
+					this.userData.add(newUser);
+					
+					outStream.writeObject(this.userData);
 					
 					outfile.close();
 					outStream.close();
