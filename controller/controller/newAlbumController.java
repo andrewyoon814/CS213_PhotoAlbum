@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -44,7 +45,7 @@ public class newAlbumController {
 	@FXML TilePane photoTile;
 	@FXML TextField albumNameField;
 
-	
+	private ArrayList<User> db;
 	private User session;
 	private ArrayList<Photo> photos = new ArrayList<Photo>();
 
@@ -52,8 +53,9 @@ public class newAlbumController {
 	 * Sets current sesssion variables.
 	 * @param session
 	 */
-	public void setUp(User session){
+	public void setUp(User session, ArrayList<User> db){
 		this.session = session;
+		this.db = db;
 		
 		//main Tile pane setup;
 		photoPane.setContent(photoTile);
@@ -110,8 +112,10 @@ public class newAlbumController {
 		FileChooser fileChooser = new FileChooser();
 		File img = fileChooser.showOpenDialog(stage);
 		
+		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		
 		//create new photo and pop upu a dialog
-		Photo newPhoto = new Photo(img.getAbsolutePath(), new Date(img.lastModified()));
+		Photo newPhoto = new Photo(img.getAbsolutePath(), sdf.format(img.lastModified()));
 		
 		//create new stage to show dialog
 		 // Load the fxml file and create a new stage for the popup dialog.
@@ -167,9 +171,16 @@ public class newAlbumController {
 	@FXML
 	public void logoutHandler(ActionEvent event) throws IOException{
 		
-		Parent root;
-		root = FXMLLoader.load(getClass().getResource("../view/login.fxml"));
-        Scene scene = new Scene(root);
+		//set fxmlloader and redirect to home
+		Parent root = null;
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(getClass().getResource("../view/login.fxml"));
+		root = loader.load();
+		LoginController loginController = loader.getController();
+		
+		loginController.setDB(db);
+		
+		Scene scene = new Scene(root);
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         
         stage.setScene(scene);
@@ -302,6 +313,7 @@ public class newAlbumController {
 			root = loader.load();
 			homeController homeController = loader.getController();
 			
+			homeController.setDB(this.db);
 			homeController.homeSetup(session);
 			
 			Scene scene = new Scene(root);

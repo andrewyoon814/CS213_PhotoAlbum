@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -17,7 +18,7 @@ public class Photo implements Serializable{
 	private String path;
 	private String caption;
 	private String name;
-	private Date date;
+	private String date;
 	private ArrayList<Tags> tags;
 	
 	/**
@@ -25,7 +26,7 @@ public class Photo implements Serializable{
 	 * 
 	 * @author Andrew Yoon
 	 */
-	public Photo(String path, Date date){
+	public Photo(String path, String date){
 		
 		this.path = path;
 		this.date = date;
@@ -39,7 +40,7 @@ public class Photo implements Serializable{
 	 * 
 	 * @author Andrew Yoon
 	 */
-	public Photo(String path, String caption, String name, Date date){
+	public Photo(String path, String caption, String name, String date){
 		this.path = path;
 		this.caption = caption;
 		this.name = name;
@@ -59,7 +60,7 @@ public class Photo implements Serializable{
 		return this.name;
 	}
 	
-	public Date getDate(){
+	public String getDate(){
 		return this.date;
 	}
 	

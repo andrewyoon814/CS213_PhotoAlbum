@@ -29,11 +29,26 @@ public class LoginController {
 	
 	public Stage stage;
 	private PhotoAlbum mainApp;
+	private ArrayList<User> db;
 	
-	public void start(PhotoAlbum root){
+	/**
+	 * This recieve the root and the "db" var which acts as our database and holds all the information.
+	 * 
+	 * @author Andrew Yoon
+	 * @param root
+	 * @param db
+	 */
+	public void start(PhotoAlbum root, ArrayList<User> db){
 		
 		this.mainApp = root;
+		this.db = db;
+		
 	}
+	
+	public void setDB(ArrayList<User> db){
+		this.db = db;
+	}
+	
 	/**
 	 * 
 	 * This method is called when the user logs in to the app and enters a username.
@@ -43,14 +58,12 @@ public class LoginController {
 	 * @author Andrew Yoon
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
 	@FXML
 	public void loginButtonHandler(ActionEvent event) throws IOException{
 		
 		//get username for textfield
 		String username = loginField.getText();
-		
-		ArrayList<User> deserArr = null;
+
 		Parent root = null;
 		
 		FXMLLoader loader = new FXMLLoader();
@@ -71,39 +84,22 @@ public class LoginController {
 		
 		}else{
 			
-			//read in the serialized data and setup the userlist.
-			File file = new File("data/users.txt");
 			boolean found = false;
-			
-			if(file.exists()){
-				try {
-			         FileInputStream fileIn = new FileInputStream(file);
-			         ObjectInputStream in = new ObjectInputStream(fileIn);
-			         deserArr = (ArrayList<User>) in.readObject();
-			         in.close();
-			         fileIn.close();
-			         
-			 		
-			      }catch(IOException | ClassNotFoundException i) {
-			         i.printStackTrace();
-			         return;
-			      }
-			
 			
 			int count = 0;
 			
-			
-			//go through deserialized array to see if it contains a user with the given username
-			while(count < deserArr.size()){
+			//go through db array to see if it contains a user with the given username
+			while(count < this.db.size()){
 				
 				//check
-				if(deserArr.get(count).getName().equals(username)){
+				if( this.db.get(count).getName().equals(username)){
 					
 					loader.setLocation(getClass().getResource("../view/home.fxml"));
 					root = loader.load();
 					homeController homeController = loader.getController();
 					
-					homeController.homeSetup(deserArr.get(count));
+					homeController.setDB(this.db);
+					homeController.homeSetup( this.db.get(count));
 					
 					Scene scene = new Scene(root);
 			        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -116,7 +112,7 @@ public class LoginController {
 				
 				count++;
 			}
-			}
+			
 			
 			if( found == false){
 				//show the error message.
