@@ -5,19 +5,21 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import model.Album;
 import model.Photo;
 import model.Tags;
 
@@ -28,11 +30,68 @@ public class PhotoDialogController {
 	@FXML TextField captionField;
 	@FXML TextField tagTypeField;
 	@FXML TextField tagValField;
-	@FXML VBox tagVBox;
+	@FXML ListView<Tags> tagList;
 	
 	private Photo photo;
+	private Album album = null;
+	private ArrayList<Photo> newAlbum;
 	private Stage dialogStage;
 	private Boolean deleted = false;
+	private ArrayList<Tags> tags;
+	public ObservableList<Tags> observableTags;
+	
+	/**
+	 * Sets the current album.
+	 * @author Andrew Yoon
+	 * @param album
+	 */
+	public void setAlbums(Album album){
+		this.album = album;
+		this.album.photoNum = album.getPhotos().size();
+	}
+	
+	/**
+	 * Sets the current album in the case that there is no album.
+	 * @author Andrew Yoon
+	 * @param album
+	 */
+	public void setAlbum(ArrayList<Photo> newAlbum){
+		this.newAlbum = newAlbum;
+	}
+	
+	/**
+	 * This method is called from a method to set tags when tags already exist to set up the lsitview.
+	 * @author Andrew Yoon
+	 * @param tags
+	 */
+	public void setTags(ArrayList<Tags> tags){
+		this.tags = tags;
+		observableTags = FXCollections.observableArrayList(this.tags);
+		tagList.setPlaceholder(new Label("No Tags yet."));
+		tagList.setItems(observableTags);
+	}
+	
+	/**
+	 * This method sets the tags when there are not tags yet. When a new photo is being added.
+	 * @author Andrew Yoon
+	 */
+	public void setTags(){
+		this.tags = new ArrayList<Tags>();
+		observableTags = FXCollections.observableArrayList(this.tags);
+		tagList.setPlaceholder(new Label("No Tags yet."));
+		tagList.setItems(observableTags);
+	}
+
+	
+	/**
+	 * Simple photo object getter. Called from the parent stage to get changes.
+	 * 
+	 * @author Andrew Yoon
+	 * @return
+	 */
+	public Photo getPhoto(){
+		return this.photo;
+	}
 	
 	/**
 	 * This method sets up the dialog and all the basic information such as the tag v box.
@@ -47,7 +106,7 @@ public class PhotoDialogController {
         //set up vbox title
         Label title = new Label("Tags Added :");
         title.setFont(Font.font("Amble CN", FontWeight.BOLD, 24));
-        tagVBox.getChildren().add(title);
+        
 	}
 	
 	/**
@@ -91,9 +150,14 @@ public class PhotoDialogController {
 	@FXML
 	public void addTagHandler(){
 		
+		
 		//get the inputted tags
 		String tagType = tagTypeField.getText();
 		String tagVal = tagValField.getText();
+		
+		if(tagType.equals("")){
+			tagType = "General";
+		}
 		
 		//create new tag object
 		Tags newTag = new Tags(tagType, tagVal);
@@ -101,13 +165,10 @@ public class PhotoDialogController {
 		//add tag to photoobject's tag list
 		this.photo.addTag(newTag);
 		
-		Label tagLabel = new Label("{" + newTag.getKey() + "}: " + newTag.getVal());
-	
-		tagVBox.setSpacing(10);
-		
-		
-		tagVBox.getChildren().add(tagLabel);
-		
+		//update the visible listview
+		observableTags.add(newTag);
+
+		//refresh the text fields
 		tagValField.setText("");
 		tagTypeField.setText("");
 	}
@@ -147,15 +208,6 @@ public class PhotoDialogController {
 
 	}
 	
-	/**
-	 * Simple photo object getter. Called from the parent stage to get changes.
-	 * 
-	 * @author Andrew Yoon
-	 * @return
-	 */
-	public Photo getPhoto(){
-		return this.photo;
-	}
 	
 	/**
 	 * This listens to the save button and onclick, it saves all changes
@@ -167,18 +219,29 @@ public class PhotoDialogController {
 		
 		if(nameField.getText() == null || nameField.getText().equals("")){
 			
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Creation Error");
-			alert.setHeaderText("No Name.");
-			alert.setContentText("Photo has no name! Please make new one!");
-			alert.showAndWait();
-			return;
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+        	alert.setTitle("Nameless Photo!");
+        	alert.setContentText("Photo has no name. If you press 'ok' a default name will be created for it.");
+
+        	Optional<ButtonType> result = alert.showAndWait();
+        	if (result.get() == ButtonType.OK){
+        		
+        		if(album != null){
+        			this.photo.setName("Photo" + album.photoNum++);
+        		}else{
+        			this.photo.setName("Photo" + newAlbum.size());
+        		}
+        		this.photo.setCaption(captionField.getText());
+        	}else{
+        		this.photo.setName(nameField.getText());
+        		this.photo.setCaption(captionField.getText());
+        	}
+		}else{
+			this.photo.setName(nameField.getText());
+    		this.photo.setCaption(captionField.getText());
 		}
 		
-		this.photo.setName(nameField.getText());
-		this.photo.setCaption(captionField.getText());
-		
-		 this.dialogStage.close();
+		this.dialogStage.close();
 	}
 	
 	

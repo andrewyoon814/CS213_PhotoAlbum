@@ -1,9 +1,8 @@
 package model;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+
 
 /**
  * 
@@ -48,30 +47,67 @@ public class Photo implements Serializable{
 		this.tags = new ArrayList<Tags>();
 	}
 	
+	
+	/**
+	 * Getter for the file path for the photo.
+	 * @author Andrew Yoon
+	 * @return
+	 */
 	public String getPath(){
 		return this.path;
 	}
 	
+	/**
+	 * Getter for the photo caption.
+	 * 
+	 * @author
+	 * @return
+	 */
 	public String getCaption(){
 		return this.caption;
 	}
 	
+	/**
+	 * Getter for the photo's name.
+	 * @author Andrew Yoon
+	 * @return
+	 */
 	public String getName(){
 		return this.name;
 	}
 	
+	/**
+	 * Getter for the photo's date.
+	 * @author Andrew Yoon
+	 * @return
+	 */
 	public String getDate(){
 		return this.date;
 	}
 	
+	/**
+	 * Gets the list of all tags related to this photo.
+	 *@author Andrew Yoon 
+	 * @return
+	 */
 	public ArrayList<Tags> getTags(){
 		return this.tags;
 	}
 	
+	/**
+	 * Setter for the photo's caption.
+	 * @author Andrew Yoon
+	 * @return
+	 */
 	public void setCaption(String caption){
 		this.caption = caption;
 	}
 	
+	/**
+	 * Setter for the photo's name.
+	 * @author Andrew Yoon
+	 * @return
+	 */
 	public void setName(String name){
 		this.name = name;
 	}
@@ -86,6 +122,11 @@ public class Photo implements Serializable{
 		tags.add(tag);
 	}
 	
+	/**
+	 * Removes given tag from the arraylist.
+	 * @author Andrew Yoon
+	 * @return
+	 */
 	public void remTag(Tags tag){
 		tags.remove(tag);
 	}

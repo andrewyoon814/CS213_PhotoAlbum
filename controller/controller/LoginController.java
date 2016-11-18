@@ -2,10 +2,7 @@ package controller;
 
 import controller.adminController;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 import javafx.event.ActionEvent;
@@ -28,7 +25,6 @@ public class LoginController {
 
 	
 	public Stage stage;
-	private PhotoAlbum mainApp;
 	private ArrayList<User> db;
 	
 	/**
@@ -39,8 +35,7 @@ public class LoginController {
 	 * @param db
 	 */
 	public void start(PhotoAlbum root, ArrayList<User> db){
-		
-		this.mainApp = root;
+	
 		this.db = db;
 		
 	}

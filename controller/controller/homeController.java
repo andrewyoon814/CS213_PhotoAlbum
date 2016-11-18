@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Optional;
 
 import javafx.event.ActionEvent;
@@ -30,6 +32,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import model.Album;
 import model.User;
 
 public class homeController {
@@ -39,7 +42,7 @@ public class homeController {
 	@FXML Label welcome;
 	private User session;
 	private ArrayList<User> db;
-	
+	private int tmpAlbumIndex;
 	
 	/**
 	 * Sets the db array in order to serialize at anytime.
@@ -51,7 +54,7 @@ public class homeController {
 		this.db = db;
 	}
 	
-	private int tmpAlbumIndex;
+	
 	/**
 	 * This method recieves the user object and sets up the home page with the users information. 
 	 * It also sets up the main pane with all the albums for this user
@@ -66,24 +69,33 @@ public class homeController {
 		mainPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); 
 		
 		//sets session state and db state
-		this. session = session;	
+		this.session = session;	
 		welcome.setText("Welcome " + session.getName() + "!");
-	
+		welcome.setAlignment(Pos.CENTER);
+		
+		//sort the albums by alphabetical order
+		 Collections.sort(session.getAlbums(), new Comparator<Album>(){
+			 	@Override
+			    public int compare(Album a1, Album a2) {
+			 		
+			 		return a1.getName().compareToIgnoreCase(a2.getName());
+			    }
+		 });
+		
 		//if there are no albums add a label saying so
 		if(session.getAlbums().size() == 0){
 			
 			Label noAlbumLabel = new Label("Currently No Albums!");
 			albumVbox.getChildren().add(noAlbumLabel);
 			albumVbox.setAlignment(Pos.CENTER);
-			
+		}else{
+			albumVbox.getChildren().clear();
 		}
 		
 		//iterate through all albums
 		int albumCount = 0;
 		while(albumCount < session.getAlbums().size()){
-		
-			albumVbox.getChildren().clear();
-		
+			
 			//Create an hbox that 
 			HBox albumHbox = new HBox();
 			albumHbox.setPadding(new Insets(15, 12, 15, 12));
@@ -110,16 +122,20 @@ public class homeController {
 			
 			albumHbox.getChildren().add(iView);
 			
-			//label with album name add to hbox		
-			albumHbox.getChildren().add(new Label("Album Name : \"" + session.getAlbums().get(albumCount).getName() + "\""));
+			//label with album name add to hbox
+			Label albumName = new Label("Album Name : \"" + session.getAlbums().get(albumCount).getName() + "\"");
+			albumName.setMinWidth(250);
+			albumName.setMaxWidth(250);
+			albumName.setAlignment(Pos.CENTER);
+			albumHbox.getChildren().add(albumName);
 			
 			//label with number of photos in album
 			albumHbox.getChildren().add(new Label("# of Photos : " + (session.getAlbums().get(albumCount).getPhotos().size() )));
 			
 			//show date range of photos
 			VBox dateBox = new VBox();
-			dateBox.getChildren().add(new Label("Range :" + session.getAlbums().get(albumCount).getPhotos().get(0).getDate()));
-			dateBox.getChildren().add(new Label("--> " + session.getAlbums().get(albumCount).getPhotos().get(0).getDate()));
+			dateBox.getChildren().add(new Label("Range :" + session.getAlbums().get(albumCount).getEarlyDate()));
+			dateBox.getChildren().add(new Label("--> " + session.getAlbums().get(albumCount).getLateDate()));
 			dateBox.setAlignment(Pos.CENTER);
 			albumHbox.getChildren().add(dateBox);
 			
@@ -132,7 +148,6 @@ public class homeController {
 			renameAlbum.setMaxWidth(Double.MAX_VALUE);
 		
 			tmpAlbumIndex = albumCount;
-			
 			renameAlbum.setOnAction(new EventHandler<ActionEvent>() {
 				
 				//gets current index that points to album and db arrray
@@ -258,7 +273,31 @@ public class homeController {
 				
 	            @Override
 	            public void handle(ActionEvent event) {
-	                System.out.println("View " + session.getAlbums().get(albumCount).getName());
+	                
+	            	Parent root = null;
+	        		FXMLLoader loader = new FXMLLoader();
+	        		
+	        		loader.setLocation(getClass().getResource("../view/albumView.fxml"));
+	        		
+	        		try {
+						root = loader.load();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+	        		albumViewController albumViewController = loader.getController();
+	        		
+	        		albumViewController.setDB(db);
+	        		albumViewController.albumViewSetup(session, albumCount);
+	        		
+	        		Scene scene = new Scene(root);
+	                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+	                
+	                //resets the local variables according to changes
+            	    setDB(albumViewController.getDB());
+        			homeSetup(session);
+	                
+	                stage.setScene(scene);
+	                stage.show();
 	                
 	            }
 	            

@@ -7,9 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,7 +25,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -87,6 +86,7 @@ public class newAlbumController {
 		root = loader.load();
 		homeController homeController = loader.getController();
 		
+		homeController.setDB(db);
 		homeController.homeSetup(session);
 		
 		Scene scene = new Scene(root);
@@ -112,51 +112,55 @@ public class newAlbumController {
 		FileChooser fileChooser = new FileChooser();
 		File img = fileChooser.showOpenDialog(stage);
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		if(img != null){
 		
-		//create new photo and pop upu a dialog
-		Photo newPhoto = new Photo(img.getAbsolutePath(), sdf.format(img.lastModified()));
-		
-		//create new stage to show dialog
-		 // Load the fxml file and create a new stage for the popup dialog.
-		Parent root;
-		FXMLLoader loader = new FXMLLoader();
-		
-		loader.setLocation(getClass().getResource("../view/photoDialog.fxml"));
-		root = loader.load();
-        
-        // Create the dialog Stage.
-        Stage dialogStage = new Stage();
-        dialogStage.setTitle("Edit Person");
-        dialogStage.initModality(Modality.WINDOW_MODAL);
-        dialogStage.initOwner(stage);
-        Scene scene = new Scene(root);
-        dialogStage.setScene(scene);
-
-        // Set the person into the controller.
-       PhotoDialogController dialogController = loader.getController();
-       dialogController.setDialogStage(dialogStage);
-       dialogController.setDetails(newPhoto);
-
-        // Show the dialog and wait until the user closes it
-        dialogStage.showAndWait();
-        
-        if(!dialogController.getDeleted()){
-	        //get changes made by user
-	        newPhoto = dialogController.getPhoto();
-	        
-	        //add to arraylist of photos
-			photos.add(newPhoto);
-	
-			//create image from the filepath.
-			Image image = new Image(img.toURI().toURL().toExternalForm());
-			ImageView iView = new ImageView(image);
-			iView.setFitHeight(300);
-			iView.setFitWidth(300);
-			iView.setPreserveRatio(true);
+			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 			
+			//create new photo and pop upu a dialog
+			Photo newPhoto = new Photo(img.getAbsolutePath(), sdf.format(img.lastModified()));
+			
+			//create new stage to show dialog
+			 // Load the fxml file and create a new stage for the popup dialog.
+			Parent root;
+			FXMLLoader loader = new FXMLLoader();
+			
+			loader.setLocation(getClass().getResource("../view/photoDialog.fxml"));
+			root = loader.load();
+	        
+	        // Create the dialog Stage.
+	        Stage dialogStage = new Stage();
+	        dialogStage.setTitle("Add Photo Information");
+	        dialogStage.initModality(Modality.WINDOW_MODAL);
+	        dialogStage.initOwner(stage);
+	        Scene scene = new Scene(root);
+	        dialogStage.setScene(scene);
+	
+	        // Set the person into the controller.
+	       PhotoDialogController dialogController = loader.getController();
+	       dialogController.setDialogStage(dialogStage);
+	       dialogController.setDetails(newPhoto);
+	       dialogController.setTags();
+	       dialogController.setAlbum(photos);
+	
+	        // Show the dialog and wait until the user closes it
+	        dialogStage.showAndWait();
+	        
+	        if(!dialogController.getDeleted()){
+		        //get changes made by user
+		        newPhoto = dialogController.getPhoto();
+		        
+		        //add to arraylist of photos
+				photos.add(newPhoto);
 		
-			photoTile.getChildren().add(iView);
+				//create image from the filepath.
+				Image image = new Image(img.toURI().toURL().toExternalForm());
+				ImageView iView = new ImageView(image);
+				iView.setFitHeight(300);
+				iView.setFitWidth(300);
+				iView.setPreserveRatio(true);
+
+				photoTile.getChildren().add(iView);
+	        }
         }
 
 	}
@@ -193,9 +197,10 @@ public class newAlbumController {
 	 * 
 	 * @author Andrew Yoon
 	 * @throws IOException 
+	 * @throws ParseException 
 	 */
 	@SuppressWarnings("unchecked")
-	@FXML public void createHandler(ActionEvent event) throws IOException{
+	@FXML public void createHandler(ActionEvent event) throws IOException, ParseException{
 		
 		boolean correctName = true;
 		
@@ -217,6 +222,7 @@ public class newAlbumController {
 		//deserArr holds the newly deserialized data
 		File file = new File("data/users.txt");
 		ArrayList<User> deserArr = null;
+		
 		
 		if(file.exists()){
 			try {
@@ -273,8 +279,13 @@ public class newAlbumController {
 		
 		//if we go here and correctName != false, no problems. Continue to serialize the data.
 		
-		if(correctName != false){
+		if(correctName != false && photos.size() > 0){
+			
+			//create album and set dateRange
 			Album album = new Album(albumName, photos);
+
+			album.setDateRange();
+			
 			
 			userCount = 0;
 			
@@ -288,6 +299,8 @@ public class newAlbumController {
 				
 				userCount++;
 			}
+			
+			this.db = deserArr;
 			
 			//serialize the new data
 			try {
@@ -313,7 +326,7 @@ public class newAlbumController {
 			root = loader.load();
 			homeController homeController = loader.getController();
 			
-			homeController.setDB(this.db);
+			homeController.setDB(deserArr);
 			homeController.homeSetup(session);
 			
 			Scene scene = new Scene(root);
@@ -322,6 +335,17 @@ public class newAlbumController {
 	        stage.setScene(scene);
 	        stage.show();
 		}
+		
+		if(photos.size() == 0 && correctName){
+			//show the error message.
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Empty Album");
+			alert.setHeaderText("No Photos were inserted!");
+			alert.setContentText("Albums cannot be empty! Please add a photo to album.");
+			alert.showAndWait();
+		}
+		
+		
 			
 	
 	}

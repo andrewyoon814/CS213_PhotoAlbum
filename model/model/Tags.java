@@ -49,4 +49,9 @@ public class Tags implements Serializable{
 	public String getVal(){
 		return this.val;
 	}
+	
+	@Override
+	public String toString(){
+		return "{" + this.key + "} : " + this.val;
+	}
 }

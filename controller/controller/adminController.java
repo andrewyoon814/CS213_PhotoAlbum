@@ -44,6 +44,7 @@ public class adminController {
 	
 	private ArrayList<User> userData;
 	public ObservableList<String> users;
+	
 	@FXML ListView<String> userList;
 	@FXML TextField userAdd;
 	
@@ -289,9 +290,16 @@ public class adminController {
 	@FXML
 	public void adminLogoutButtonHandler(ActionEvent event) throws IOException{
 		
-		Parent root;
-		root = FXMLLoader.load(getClass().getResource("../view/login.fxml"));
-        Scene scene = new Scene(root);
+		//set fxmlloader and redirect to home
+		Parent root = null;
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(getClass().getResource("../view/login.fxml"));
+		root = loader.load();
+		LoginController loginController = loader.getController();
+		
+		loginController.setDB(this.userData);
+		
+		Scene scene = new Scene(root);
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         
         stage.setScene(scene);
