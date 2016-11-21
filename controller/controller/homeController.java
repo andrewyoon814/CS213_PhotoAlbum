@@ -286,18 +286,18 @@ public class homeController {
 					}
 	        		albumViewController albumViewController = loader.getController();
 	        		
-	        		albumViewController.setDB(db);
-	        		albumViewController.albumViewSetup(session, albumCount);
-	        		
 	        		Scene scene = new Scene(root);
 	                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+	                stage.setScene(scene);
+	                stage.show();
+	                
+	                albumViewController.setDB(db);
+	        		albumViewController.albumViewSetup(session, albumCount);
 	                
 	                //resets the local variables according to changes
             	    setDB(albumViewController.getDB());
-        			homeSetup(session);
-	                
-	                stage.setScene(scene);
-	                stage.show();
+        			homeSetup(albumViewController.getSession());
 	                
 	            }
 	            
@@ -390,6 +390,8 @@ public class homeController {
 		SearchController search = loader.getController();
 		
 		search.setUpSession(session);
+		search.setDB(db);
+		search.setUpTags();
 		
 		Scene scene = new Scene(root);
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

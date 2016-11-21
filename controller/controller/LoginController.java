@@ -69,13 +69,14 @@ public class LoginController {
 			loader.setLocation(getClass().getResource("../view/adminPage.fxml"));
 			root = loader.load();
 			adminController adminController = loader.getController();
-			adminController.adminPageSetup(event);
+			
 			
 			Scene scene = new Scene(root);
 	        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 	        
 	        stage.setScene(scene);
 	        stage.show();
+	        adminController.adminPageSetup(event);
 		
 		}else{
 			
@@ -91,16 +92,16 @@ public class LoginController {
 					
 					loader.setLocation(getClass().getResource("../view/home.fxml"));
 					root = loader.load();
-					homeController homeController = loader.getController();
-					
-					homeController.setDB(this.db);
-					homeController.homeSetup( this.db.get(count));
-					
+
 					Scene scene = new Scene(root);
 			        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 			        
 			        stage.setScene(scene);
 			        stage.show();
+			        
+					homeController homeController = loader.getController();
+			        homeController.setDB(this.db);
+					homeController.homeSetup( this.db.get(count));
 			        
 			        found = true;
 				}

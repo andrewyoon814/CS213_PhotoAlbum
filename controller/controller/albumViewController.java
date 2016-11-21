@@ -70,6 +70,15 @@ public class albumViewController {
 	}
 	
 	/**
+	 * Gets the session object that reflects the  current state.
+	 * @author Andrew Yoon
+	 * @param db
+	 */
+	public User getSession(){
+		return this.session;
+	}
+	
+	/**
 	 * Sets the session variable to the current user's user object
 	 * @param session
 	 */
@@ -144,14 +153,14 @@ public class albumViewController {
 			
 			//label with photo name	
 			Label photoName = new Label("Photo Name : \"" + this.album.getPhotos().get(count).getName() + "\"");
-			photoName.setMinWidth(225);
-			photoName.setMaxWidth(225);
+			photoName.setMinWidth(200);
+			photoName.setMaxWidth(200);
 			photoHbox.getChildren().add(photoName);
 			
 			//label with photo caption 
 			Label photoCaption = new Label();
-			photoCaption.setMinWidth(225);
-			photoCaption.setMaxWidth(225);
+			photoCaption.setMinWidth(200);
+			photoCaption.setMaxWidth(200);
 			
 			if(this.album.getPhotos().get(count).getCaption().equals("")){
 				photoCaption.setText("Caption : _No Caption_");
@@ -166,8 +175,57 @@ public class albumViewController {
 			
 			tmpPhotoIndex = count;
 			
+			
+			//Create a button for viewing this photo, set listener, and add to button hbox
+			Button viewPhoto = new Button("VIEW");
+
+			viewPhoto.setOnAction(new EventHandler<ActionEvent>() {
+				
+				int photoCount = tmpPhotoIndex;
+				
+	            @Override
+	            public void handle(ActionEvent event) {
+
+	        		Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+	    			
+	    			//create new stage to show dialog
+	    			// Load the fxml file and create a new stage for the popup dialog.
+	    			Parent root = null;
+	    			FXMLLoader loader = new FXMLLoader();
+	    			
+	    			loader.setLocation(getClass().getResource("../view/slideshowDialog.fxml"));
+	    			
+	    			try {
+						root = loader.load();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+	    			
+	            	 // Create the dialog Stage.
+	    	        Stage dialogStage = new Stage();
+	    	        dialogStage.setTitle("View Photo");
+	    	        dialogStage.initModality(Modality.WINDOW_MODAL);
+	    	        dialogStage.initOwner(stage);
+	    	        Scene scene = new Scene(root);
+	    	        
+	    	        dialogStage.setScene(scene);
+
+	    	        slideShowController slideShowController = loader.getController();
+	    	        slideShowController.setPhoto(album.getPhotos().get(photoCount));
+	    	        
+	    	        // Show the dialog and wait until the user closes it
+	    	        dialogStage.showAndWait();
+	    	        slideShowController.closeInfoPane();
+	    	        
+	            
+	            }
+	            
+	        });
+			
+			buttonHbox.getChildren().add(viewPhoto);
+			
 			//Create a button for deleting this photo, set listener, and add to button hbox
-			Button deletePhoto = new Button("DELETE PHOTO");
+			Button deletePhoto = new Button("DELETE");
 
 			deletePhoto.setOnAction(new EventHandler<ActionEvent>() {
 				
@@ -218,6 +276,15 @@ public class albumViewController {
 	            				e.printStackTrace();
 	            			}
 	            			
+	            			//sort the albums by alphabetical order
+	            			 Collections.sort(session.getAlbums(), new Comparator<Album>(){
+	            				 	@Override
+	            				    public int compare(Album a1, Album a2) {
+	            				 		
+	            				 		return a1.getName().compareToIgnoreCase(a2.getName());
+	            				    }
+	            			 });
+	            			
 	            			photoVbox.getChildren().clear();
 	            			albumViewSetup(session, albumCount);
 			         
@@ -265,10 +332,6 @@ public class albumViewController {
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
-	            			homeController homeController = loader.getController();
-	            			
-	            			homeController.homeSetup(session);
-	            			homeController.setDB(tmpdb);
 	            			
 	            			Scene scene = new Scene(root);
 	            	        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -276,6 +339,10 @@ public class albumViewController {
 	            	        stage.setScene(scene);
 	            	        stage.show();
 
+	            			homeController homeController = loader.getController();
+	            			
+	            			homeController.homeSetup(session);
+	            			homeController.setDB(tmpdb);
 		            	}
 		            }
 	            }
@@ -285,7 +352,7 @@ public class albumViewController {
 			buttonHbox.getChildren().add(deletePhoto);
 			
 			//Create a button for modifying this photo, set listener, and add to button hbox
-			Button modifyPhoto = new Button("MODIFY PHOTO");
+			Button modifyPhoto = new Button("MODIFY");
 
 			modifyPhoto.setOnAction(new EventHandler<ActionEvent>() {
 				
@@ -381,7 +448,7 @@ public class albumViewController {
 			
 			
 			//Create a button for copying this photo, set listener, and add to button hbox
-			Button copyPhoto = new Button("COPY PHOTO");
+			Button copyPhoto = new Button("COPY");
 
 			copyPhoto.setOnAction(new EventHandler<ActionEvent>() {
 				
@@ -389,7 +456,44 @@ public class albumViewController {
 				
 	            @Override
 	            public void handle(ActionEvent event) {
-	            	System.out.println("copy" + photoCount);
+	            	
+	            	Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+	            	
+	            	Parent root = null;
+	    			FXMLLoader loader = new FXMLLoader();
+	    			
+	    			loader.setLocation(getClass().getResource("../view/copyDialog.fxml"));
+	    			try {
+						root = loader.load();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+	    	        
+	    	        // Create the dialog Stage.
+	    	        Stage dialogStage = new Stage();
+	    	        dialogStage.setTitle("Copy Photo");
+	    	        dialogStage.initModality(Modality.WINDOW_MODAL);
+	    	        dialogStage.initOwner(stage);
+	    	        Scene scene = new Scene(root);
+	    	        dialogStage.setScene(scene);
+	    		
+	    			copyController copyController = loader.getController();
+	    			
+	    			//sets the session state
+	    			copyController.setDB(db);
+	    			copyController.setPrev(album.getName());
+	    			copyController.setSession(session, albumCount);
+	    			copyController.setUp(album.getPhotos().get(photoCount));
+	    			
+	    		
+	    			// Show the dialog and wait until the user closes it
+	    	        dialogStage.showAndWait();
+	    	        
+	    	        photoVbox.getChildren().clear();
+	    	        setSession(copyController.getSession());
+	            	setAlbum(session.getAlbums().get(copyController.getAlbumCount()));
+	    	        
+        			albumViewSetup(session, copyController.getAlbumCount());
 	            }
 	            
 	        });
@@ -398,7 +502,7 @@ public class albumViewController {
 			
 			
 			//Create a button for moving this photo, set listener, and add to button hbox
-			Button movePhoto = new Button("MOVE PHOTO");
+			Button movePhoto = new Button("MOVE");
 
 			movePhoto.setOnAction(new EventHandler<ActionEvent>() {
 				
@@ -406,13 +510,59 @@ public class albumViewController {
 				
 	            @Override
 	            public void handle(ActionEvent event) {
-	            	System.out.println("move" + photoCount);
+	            	
+	            	Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+	            	
+	            	Parent root = null;
+	    			FXMLLoader loader = new FXMLLoader();
+	    			
+	    			loader.setLocation(getClass().getResource("../view/moveDialog.fxml"));
+	    			try {
+						root = loader.load();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+	    	        
+	    	        // Create the dialog Stage.
+	    	        Stage dialogStage = new Stage();
+	    	        dialogStage.setTitle("Move Photo");
+	    	        dialogStage.initModality(Modality.WINDOW_MODAL);
+	    	        dialogStage.initOwner(stage);
+	    	        Scene scene = new Scene(root);
+	    	        dialogStage.setScene(scene);
+
+	    			
+	    			moveController moveController = loader.getController();
+	    			
+	    			//sets the session state
+	    			moveController.setDB(db);
+	    			moveController.setPrev(album.getName());
+	    			moveController.setSession(session, albumCount);
+	    			moveController.setUp(album.getPhotos().get(photoCount));
+	    			
+	    			// Show the dialog and wait until the user closes it
+	    	        dialogStage.showAndWait();
+	    	        
+	    	        if(moveController.getDeleted() == false){
+		    	        photoVbox.getChildren().clear();
+		    	        setSession(moveController.getSession());
+		            	setAlbum(session.getAlbums().get(moveController.getAlbumCount()));
+		    	        
+	        			albumViewSetup(session, moveController.getAlbumCount());
+	    	        }else{
+	    	        	try {
+							goHomeHandler(event);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+	    	        }
 	            }
 	            
 	        });
 			
 			buttonHbox.getChildren().add(movePhoto);
 			buttonHbox.setAlignment(Pos.CENTER);
+			buttonHbox.setSpacing(10);
 			
 			//add button hbox into the photohbox
 			photoHbox.getChildren().add(buttonHbox);
@@ -501,6 +651,7 @@ public class albumViewController {
 	       dialogController.setDialogStage(dialogStage);
 	       dialogController.setDetails(newPhoto);
 	       dialogController.setAlbums(album);
+	       dialogController.setTags();
 	
 	        // Show the dialog and wait until the user closes it
 	        dialogStage.showAndWait();
@@ -538,9 +689,14 @@ public class albumViewController {
 		root = loader.load();
 		homeController homeController = loader.getController();
 		
-		homeController.homeSetup(session);
-		homeController.setDB(db);
+		//set this objects session variables
+		setDB(db);
+		setSession(session);
 		
+		//set the home controllers session variables
+		homeController.setDB(db);
+		homeController.homeSetup(session);
+				
 		Scene scene = new Scene(root);
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         

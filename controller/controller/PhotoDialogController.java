@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
@@ -19,6 +20,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import model.Album;
 import model.Photo;
 import model.Tags;
@@ -102,6 +104,25 @@ public class PhotoDialogController {
 		
 		//set stage
         this.dialogStage = dialogStage;
+        
+        this.dialogStage.setOnCloseRequest(new EventHandler <WindowEvent>(){
+
+			@Override
+			public void handle(WindowEvent event) {
+				
+				//gets users confirmation if they do not want to save
+				Alert alert = new Alert(AlertType.CONFIRMATION);
+				alert.setTitle("Are You Sure?");
+				alert.setHeaderText("Save?");
+				alert.setContentText("Do you want to save current changes?");
+
+				Optional<ButtonType> result = alert.showAndWait();
+				if (result.get() == ButtonType.OK){
+					saveButtonHandler();
+				}
+				
+			}
+        });
         
         //set up vbox title
         Label title = new Label("Tags Added :");
@@ -242,6 +263,25 @@ public class PhotoDialogController {
 		}
 		
 		this.dialogStage.close();
+	}
+	
+	/** 
+	 * Allows you to delete the selected tag.
+	 */
+	@FXML
+	public void deleteTagHandler(){
+		
+		//get what is to be selected
+		Tags deleteTag = tagList.getSelectionModel().getSelectedItem();
+		
+		if(deleteTag != null){
+			//remove the tag from the database
+			this.photo.remTag(deleteTag);
+			
+			//remove from obserbale list
+			observableTags.remove(deleteTag);
+		}
+		
 	}
 	
 	
