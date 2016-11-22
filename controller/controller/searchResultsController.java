@@ -169,7 +169,7 @@ public class searchResultsController {
 
 		// Traditional way to get the response value.
 		Optional<String> result = dialog.showAndWait();
-		if (result.isPresent() && !result.get().equals("Please Enter Album Name :")){
+		if (result.isPresent() && !result.get().equals("Please Enter Album Name :") && !result.get().equals("")){
 		    name = result.get();
 		}else{
 			name = "SearchResultAlbum" + session.getAlbums().size();
