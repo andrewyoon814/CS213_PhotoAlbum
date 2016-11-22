@@ -7,19 +7,19 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1250.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.slideShowController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="881.0" prefWidth="1250.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.slideShowController">
    <children>
-      <ImageView fx:id="pictureView" fitHeight="817.0" fitWidth="1250.0" pickOnBounds="true" preserveRatio="true" />
-      <HBox layoutX="391.0" layoutY="833.0" spacing="50.0">
+      <ImageView fx:id="pictureView" fitHeight="815.0" fitWidth="1250.0" pickOnBounds="true" preserveRatio="true" />
+      <HBox layoutX="391.0" layoutY="815.0" prefWidth="469.0" spacing="50.0">
          <children>
-            <Button fx:id="prevButton" mnemonicParsing="false" onAction="#prevHandler" prefHeight="68.0" prefWidth="98.0" text="&lt;&lt;" />
+            <Button fx:id="prevButton" mnemonicParsing="false" onAction="#prevHandler" prefHeight="65.0" prefWidth="98.0" text="&lt;&lt;" />
             <VBox>
                <children>
                   <Label fx:id="photoNumber" prefHeight="21.0" prefWidth="172.0" />
                   <Button fx:id="viewDetailsButton" mnemonicParsing="false" onAction="#viewDetailsHandler" prefHeight="44.0" prefWidth="173.0" text="VIEW PHOTO DETAILS" />
                </children>
             </VBox>
-            <Button fx:id="nextButton" mnemonicParsing="false" onAction="#nextHandler" prefHeight="68.0" prefWidth="98.0" text="&gt;&gt;" />
+            <Button fx:id="nextButton" mnemonicParsing="false" onAction="#nextHandler" prefHeight="64.0" prefWidth="98.0" text="&gt;&gt;" />
          </children>
       </HBox>
    </children>

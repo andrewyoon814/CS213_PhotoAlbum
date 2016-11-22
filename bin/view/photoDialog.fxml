@@ -45,7 +45,7 @@
       <Button layoutX="1017.0" layoutY="494.0" mnemonicParsing="false" onAction="#deleteTagHandler" text="Delete Tag" />
       <HBox layoutX="113.0" layoutY="554.0">
          <children>
-            <Button fx:id="delete" mnemonicParsing="false" onAction="#deletePhotoDialogHandler" prefHeight="60.0" prefWidth="192.0" text="DELETE" />
+            <Button fx:id="delete" mnemonicParsing="false" onAction="#deletePhotoDialogHandler" prefHeight="60.0" prefWidth="192.0" text="CANCEL" />
             <Button fx:id="save" mnemonicParsing="false" onAction="#saveButtonHandler" prefHeight="60.0" prefWidth="192.0" text="SAVE" />
          </children>
       </HBox>

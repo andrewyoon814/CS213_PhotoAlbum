@@ -39,6 +39,14 @@ public class slideShowController {
 	private int toggle = 0;
 	private Stage infoPopUp = new Stage();
 	private Scene infoscene;
+	private boolean slideshow;
+	private boolean first;
+	private VBox info;
+	private Label photoName;
+	private Label photoCaption;
+	private Label photoDate;
+	private VBox tagList;
+	private Label Tagtitle;
 
 
 	/**
@@ -49,9 +57,13 @@ public class slideShowController {
 	 */
 	public void setUp(Album album){
 		
+		this.slideshow = true;
+		this.first = true;
+		
 		//get the list of phootos to disply
 		this.photoList = album.getPhotos();
 		this.currentPhoto = 0;
+
 		
 		populateDialog();
 	}
@@ -63,6 +75,8 @@ public class slideShowController {
 	 * @param photo
 	 */
 	public void setPhoto(Photo photo){
+		
+		this.slideshow = false;
 	
 		//put photo up in the image view
 		File file = new File(photo.getPath());
@@ -112,6 +126,114 @@ public class slideShowController {
 		tmp++;
 		photoNumber.setText(tmp + "/" + this.photoList.size());
 		photoNumber.setAlignment(Pos.CENTER);
+
+		slideShowSetup();
+	}
+	
+	
+	/**
+	 * This method handles the photo metadata window when the data is a list of photos and not a single photo.
+	 * The toggle variable signfies state. 0 means not set up. 1 means the window is closed and must be opened. 2 means the window
+	 * is open and must be closed.
+	 * 
+	 * @author Andrew Yoon
+	 */
+	public void slideShowSetup(){
+		
+		//check if this is the first time opening the window
+		if(this.first == true){
+				
+			//if so... set up all javafx elements but do not show
+				Label title = new Label("Photo Metadata : ");
+				title.setFont(new Font(20));
+				
+				//these are labels that hold the photo information
+				photoName = new Label("Name : " + photoList.get(currentPhoto).getName());
+				photoCaption = new Label("Caption : " + photoList.get(currentPhoto).getCaption());
+				photoDate = new Label("Date Taken : " + photoList.get(currentPhoto).getDate());
+				
+				photoName.setFont(new Font(20));
+				photoCaption.setFont(new Font(20));
+				photoDate.setFont(new Font(20));
+
+				ScrollPane root = new ScrollPane();
+
+				//vbox holds all the labels
+				info = new VBox();
+				
+				info.getChildren().add(title);
+				info.getChildren().add(new Label());
+				info.getChildren().add(photoName);
+				info.getChildren().add(photoCaption);
+				info.getChildren().add(photoDate);
+				info.getChildren().add(new Label());
+				
+				//get all the tags of photo
+				tagList = new VBox();
+				Tagtitle = new Label("Tags : ");
+				tagList.getChildren().add(Tagtitle);
+				Tagtitle.setFont(new Font(20));
+				
+				for(Tags tags : photoList.get(currentPhoto).getTags()){
+					Label tag = new Label(tags.toString());
+					tag.setFont(new Font(20));
+					tagList.getChildren().add(tag);
+				}
+				
+				info.getChildren().add(tagList);
+
+				
+				root.setContent(info);
+			    root.setStyle(
+			    		"-fx-background-color: rgba(16,16,16,.5);" +
+			    		"-fx-background: rgba(16,16,16,.5);" +
+			    		"-fx-color: rgba(16,16,16,.5)"
+			                );
+			    
+		
+			    infoscene = new Scene(root, 400, 850, Color.BLACK);
+			    infoscene.setFill(Color.TRANSPARENT);
+			    infoPopUp.initStyle(StageStyle.TRANSPARENT);
+			    infoPopUp.setScene(infoscene);
+			    viewDetailsButton.setText("VIEW PHOTO DETAILS");
+			    
+			    toggle = 1;
+
+			    //change first to false
+			    this.first = false;
+		}else{
+			
+			//from the second time on... use the toggle variable to show and hide
+			if(toggle == 0){
+				
+				//these are labels that hold the photo information
+				photoName.setText("Name : " + photoList.get(currentPhoto).getName());
+				photoCaption.setText("Caption : " + photoList.get(currentPhoto).getCaption());
+				photoDate.setText("Date Taken : " + photoList.get(currentPhoto).getDate());
+				
+				tagList.getChildren().clear();
+				
+				tagList.getChildren().add(Tagtitle);
+				
+				for(Tags tags : photoList.get(currentPhoto).getTags()){
+					Label tag = new Label(tags.toString());
+					tag.setFont(new Font(20));
+					tagList.getChildren().add(tag);
+				}
+				
+				toggle = 1;
+				
+			}else if(toggle == 1){	
+			
+				infoPopUp.show();
+				viewDetailsButton.setText("HIDE PHOTO DETAILS");
+				toggle = 2;
+			}else if (toggle == 2){
+				infoPopUp.close();
+				viewDetailsButton.setText("VIEW PHOTO DETAILS");
+				toggle = 1;
+			}
+		}
 	}
 	
 	/**
@@ -128,82 +250,97 @@ public class slideShowController {
 			currentPhoto--;
 		}
 		
+		infoPopUp.close();
+		toggle = 0;
 		populateDialog();
-		
+
 	}
 	
 	/**
 	 * This method launches a dialog taht has all the photo information in it.
+	 * The toggle variable signfies state. 0 means not set up. 1 means the window is closed and must be opened. 2 means the window
+	 * is open and must be closed.
 	 * @author Andrew Yoon
 	 */
 	@FXML
-	public void viewDetailsHandler(ActionEvent event){
-		
-		if( toggle == 0){
-			
-			Label title = new Label("Photo Metadata : ");
-			title.setFont(new Font(20));
-			
-			//these are labels that hold the photo information
-			Label photoName = new Label("Name : " + this.showPhoto.getName());
-			Label photoCaption = new Label("Caption : " + this.showPhoto.getCaption());
-			Label photoDate = new Label("Date Taken : " + this.showPhoto.getDate());
-			
-			photoName.setFont(new Font(20));
-			photoCaption.setFont(new Font(20));
-			photoDate.setFont(new Font(20));
+	public void viewDetailsHandler(){
 
-			ScrollPane root = new ScrollPane();
-
-			//vbox holds all the labels
-			VBox info = new VBox();
+		//first check if its slide show or not
+		if(slideshow == false){
 			
-			info.getChildren().add(title);
-			info.getChildren().add(new Label());
-			info.getChildren().add(photoName);
-			info.getChildren().add(photoCaption);
-			info.getChildren().add(photoDate);
-			info.getChildren().add(new Label());
-			
-			//get all the tags of photo
-			VBox tagList = new VBox();
-			Label Tagtitle = new Label("Tags : ");
-			tagList.getChildren().add(Tagtitle);
-			Tagtitle.setFont(new Font(20));
-			
-			for(Tags tags : this.showPhoto.getTags()){
-				Label tag = new Label(tags.toString());
-				tag.setFont(new Font(20));
-				tagList.getChildren().add(tag);
-			}
-			
-			info.getChildren().add(tagList);
-
-			
-			root.setContent(info);
-		    root.setStyle(
-		    		"-fx-background-color: rgba(0, 52, 71, 0.7);" +
-		    		"-fx-background: rgba(0, 52, 71, 0.7);" +
-		    		"-fx-color: rgba(0, 52, 71, 0.7)"
-		                );
-		    
+			//if not it is a single photo so use the toggle variable to show and hide
+			if( toggle == 0){
+				
+				Label title = new Label("Photo Metadata : ");
+				title.setFont(new Font(20));
+				
+				//these are labels that hold the photo information
+				photoName = new Label("Name : " + this.showPhoto.getName());
+				photoCaption = new Label("Caption : " + this.showPhoto.getCaption());
+				photoDate = new Label("Date Taken : " + this.showPhoto.getDate());
+				
+				photoName.setFont(new Font(20));
+				photoCaption.setFont(new Font(20));
+				photoDate.setFont(new Font(20));
 	
-		    infoscene = new Scene(root, 400, 850, Color.BLACK);
-		    infoscene.setFill(Color.TRANSPARENT);
-		    infoPopUp.initStyle(StageStyle.TRANSPARENT);
-		    infoPopUp.setScene(infoscene);
-		    infoPopUp.show();
-		    
-		    toggle = 2;
-		}else if(toggle == 1){
-			infoPopUp.show();
-			viewDetailsButton.setText("HIDE PHOTO DETAILS");
-			toggle = 2;
-		}else if (toggle == 2){
-			infoPopUp.close();
-			viewDetailsButton.setText("VIEW PHOTO DETAILS");
-			toggle = 1;
+				ScrollPane root = new ScrollPane();
+	
+				//vbox holds all the labels
+				info = new VBox();
+				
+				info.getChildren().add(title);
+				info.getChildren().add(new Label());
+				info.getChildren().add(photoName);
+				info.getChildren().add(photoCaption);
+				info.getChildren().add(photoDate);
+				info.getChildren().add(new Label());
+				
+				//get all the tags of photo
+				tagList = new VBox();
+				Tagtitle = new Label("Tags : ");
+				tagList.getChildren().add(Tagtitle);
+				Tagtitle.setFont(new Font(20));
+				
+				for(Tags tags : this.showPhoto.getTags()){
+					Label tag = new Label(tags.toString());
+					tag.setFont(new Font(20));
+					tagList.getChildren().add(tag);
+				}
+				
+				info.getChildren().add(tagList);
+	
+				
+				root.setContent(info);
+			    root.setStyle(
+			    		"-fx-background-color: rgba(16,16,16,.5);" +
+			    		"-fx-background: rgba(16,16,16,.5);" +
+			    		"-fx-color: rgba(16,16,16,.5)"
+			                );
+			    
+		
+			    infoscene = new Scene(root, 400, 850, Color.BLACK);
+			    infoscene.setFill(Color.TRANSPARENT);
+			    infoPopUp.initStyle(StageStyle.TRANSPARENT);
+			    infoPopUp.setScene(infoscene);
+			    infoPopUp.show();
+			    viewDetailsButton.setText("HIDE PHOTO DETAILS");
+			    
+			    toggle = 2;
+			}else if(toggle == 1){
+	
+				infoPopUp.show();
+				viewDetailsButton.setText("HIDE PHOTO DETAILS");
+				toggle = 2;
+			}else if (toggle == 2){
+				infoPopUp.close();
+				viewDetailsButton.setText("VIEW PHOTO DETAILS");
+				toggle = 1;
+			}
+		}else{
+			//else let slideshowsetup do the work bc it isnt jsut a single photo
+			slideShowSetup();
 		}
+
 	}
 	
 	/**
@@ -230,7 +367,9 @@ public class slideShowController {
 		if(currentPhoto == photoList.size()){
 			currentPhoto = 0;
 		}
-			
+		
+		infoPopUp.close();
+		toggle = 0;
 		populateDialog();
 	}
 }

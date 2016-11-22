@@ -606,6 +606,7 @@ public class albumViewController {
 
         // Show the dialog and wait until the user closes it
         dialogStage.showAndWait();
+       slideShowController.closeInfoPane();
 	}
 	
 	/**
