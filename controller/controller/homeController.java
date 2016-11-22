@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -81,7 +82,7 @@ public class homeController {
 			 		return a1.getName().compareToIgnoreCase(a2.getName());
 			    }
 		 });
-		
+		 
 		//if there are no albums add a label saying so
 		if(session.getAlbums().size() == 0){
 			
@@ -95,6 +96,12 @@ public class homeController {
 		//iterate through all albums
 		int albumCount = 0;
 		while(albumCount < session.getAlbums().size()){
+			
+			try{
+			session.getAlbums().get(albumCount).setDateRange();
+			}catch(ParseException e){
+				e.printStackTrace();
+			}
 			
 			//Create an hbox that 
 			HBox albumHbox = new HBox();

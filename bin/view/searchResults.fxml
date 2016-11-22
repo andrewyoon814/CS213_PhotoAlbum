@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1250.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.searchResultsController">
+   <children>
+      <VBox layoutX="1008.0" layoutY="291.0" prefHeight="62.0" prefWidth="242.0" spacing="30.0">
+         <padding>
+            <Insets bottom="20.0" top="20.0" />
+         </padding>
+      </VBox>
+      <Label fx:id="welcome" layoutX="121.0" prefHeight="61.0" prefWidth="1007.0">
+         <font>
+            <Font size="37.0" />
+         </font>
+      </Label>
+      <ScrollPane fx:id="mainPane" layoutX="-1.0" layoutY="59.0" prefHeight="769.0" prefWidth="1250.0">
+         <content>
+            <VBox fx:id="photoVbox" prefHeight="765.0" prefWidth="1233.0" />
+         </content></ScrollPane>
+      <HBox layoutY="837.0" prefHeight="63.0" prefWidth="1250.0" spacing="180.0">
+         <children>
+            <Button mnemonicParsing="false" onAction="#logoutHandler" prefHeight="60.0" prefWidth="176.0" text="LOGOUT" />
+            <Button mnemonicParsing="false" onAction="#slideShowHandler" prefHeight="60.0" prefWidth="176.0" text="VIEW SLIDESHOW" />
+            <Button mnemonicParsing="false" onAction="#createAlbumHandler" prefHeight="59.0" prefWidth="181.0" text="CREATE ALBUM" />
+            <Button mnemonicParsing="false" onAction="#goHomeHandler" prefHeight="60.0" prefWidth="176.0" text="GO HOME" />
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>
