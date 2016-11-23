@@ -125,17 +125,26 @@ public class PhotoDialogController {
 		
 		//set stage
         this.dialogStage = dialogStage;
-        /*
+        
         this.dialogStage.setOnCloseRequest(new EventHandler <WindowEvent>(){
 
 			@Override
 			public void handle(WindowEvent event) {
 
-				//on close, save
-				saveButtonHandler();
-				
+				//gets users confirmation if they do not want to save
+				Alert alert = new Alert(AlertType.CONFIRMATION);
+				alert.setTitle("Are You Sure?");
+				alert.setHeaderText("Save?");
+				alert.setContentText("Do you want to save current changes?");
+	 
+				Optional<ButtonType> result = alert.showAndWait();
+				if (result.get() == ButtonType.OK){
+					saveButtonHandler();
+				}else{
+					deleted = true;
+				}
 			}
-        });*/
+        });
         
         //set up vbox title
         Label title = new Label("Tags Added :");
