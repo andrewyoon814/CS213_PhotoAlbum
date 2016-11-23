@@ -629,7 +629,7 @@ public class albumViewController {
 			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 			
 			//create new photo and pop upu a dialog
-			Photo newPhoto = new Photo(img.getAbsolutePath(), sdf.format(img.lastModified()));
+			Photo newPhoto = new Photo(img.getPath(), sdf.format(img.lastModified()));
 			
 			//create new stage to show dialog
 			 // Load the fxml file and create a new stage for the popup dialog.
