@@ -6,9 +6,10 @@ This is Andrew Yoon and Kevin Bundschuh's CS213 Photo Album Project.
 
 To our grader...
 
-I have created a user profile called 'anwar' beforehand. It should have 2 albums.
-One album is named 'Korea' and contains 10 photos of mine.
-The other is 'nature' and contains 6 photos from google. I realized I downloaded them very small so when they are enlarged they come out as blurry.
+I have created a user profile called 'anwar' beforehand. 
+You can log in by typing 'anwar' or go to the admin page by typing 'admin'.
+
+I have added about 16 various pictures in the data folder for the grader to use.
 
 ### Google Vision Api ###
 

@@ -198,21 +198,51 @@ public class PhotoDialogController {
 		String tagType = tagTypeField.getText();
 		String tagVal = tagValField.getText();
 		
+		//checks if tag tpye is empty. If so, it sets it to general
 		if(tagType.equals("")){
 			tagType = "General";
 		}
 		
-		//create new tag object
-		Tags newTag = new Tags(tagType, tagVal);
+		
+		if(tagVal.isEmpty()){
 
-		//add tag to photoobject's tag list
-		this.photo.addTag(newTag);
+			//Disallows creating a tag with an empty body
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("Empty Tag");
+			alert.setHeaderText("Cannot create the tag.");
+			alert.setContentText("Tag value is empty.");
+			alert.showAndWait();
+			
+			return;
+		}else{
+
+			//create new tag object
+			Tags newTag = new Tags(tagType, tagVal);
 	
-		//update the visible listview
-		observableTags.add(newTag);
-		//refresh the text fields
-		tagValField.setText("");
-		tagTypeField.setText("");
+			//compares the tag to all tags in photo tag list
+			// if duplicate values exist , disallow
+			for(Tags compTag : photo.getTags()){
+				if(compTag.getKey().equals(tagType) && compTag.getVal().equals(tagVal)){
+					//Disallows creating a tag with an empty body
+					Alert alert = new Alert(AlertType.CONFIRMATION);
+					alert.setTitle("Duplicate tag");
+					alert.setHeaderText("Cannot create the tag.");
+					alert.setContentText("There is already a tag with the same values.");
+					alert.showAndWait();
+					
+					return;
+				}
+			}
+		
+			//add tag to photoobject's tag list
+			this.photo.addTag(newTag);
+			
+			//update the visible listview
+			observableTags.add(newTag);
+			//refresh the text fields
+			tagValField.setText("");
+			tagTypeField.setText("");
+		}
 	}
 	
 	
