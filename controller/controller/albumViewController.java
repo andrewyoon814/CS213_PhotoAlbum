@@ -703,6 +703,22 @@ public class albumViewController {
         
         stage.setScene(scene);
         stage.show();
+        
+		//serialize the new data
+		try {
+			FileOutputStream outfile = new FileOutputStream("data/users.txt");
+			ObjectOutputStream outStream = new ObjectOutputStream(outfile);
+		
+			//write the previously deserialized array
+			outStream.writeObject(db);
+			
+			outfile.close();
+			outStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -727,6 +743,22 @@ public class albumViewController {
         
         stage.setScene(scene);
         stage.show();
+        
+		//serialize the new data
+		try {
+			FileOutputStream outfile = new FileOutputStream("data/users.txt");
+			ObjectOutputStream outStream = new ObjectOutputStream(outfile);
+		
+			//write the previously deserialized array
+			outStream.writeObject(db);
+			
+			outfile.close();
+			outStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

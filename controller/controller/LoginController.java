@@ -102,6 +102,7 @@ public class LoginController {
 					homeController homeController = loader.getController();
 			        homeController.setDB(this.db);
 					homeController.homeSetup( this.db.get(count));
+					
 			        
 			        found = true;
 				}

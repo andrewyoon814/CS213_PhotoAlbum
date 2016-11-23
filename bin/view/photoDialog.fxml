@@ -43,12 +43,17 @@
       </Label>
       <TextField fx:id="tagValField" layoutX="991.0" layoutY="428.0" prefHeight="38.0" prefWidth="241.0" />
       <Button layoutX="1017.0" layoutY="494.0" mnemonicParsing="false" onAction="#deleteTagHandler" text="Delete Tag" />
-      <HBox layoutX="113.0" layoutY="554.0">
+      <HBox layoutX="113.0" layoutY="558.0">
          <children>
             <Button fx:id="delete" mnemonicParsing="false" onAction="#deletePhotoDialogHandler" prefHeight="60.0" prefWidth="192.0" text="CANCEL" />
             <Button fx:id="save" mnemonicParsing="false" onAction="#saveButtonHandler" prefHeight="60.0" prefWidth="192.0" text="SAVE" />
          </children>
       </HBox>
       <Button layoutX="1109.0" layoutY="494.0" mnemonicParsing="false" onAction="#addTagHandler" prefHeight="31.0" prefWidth="92.0" text="Add Tag" />
+      <Button layoutX="1017.0" layoutY="525.0" mnemonicParsing="false" onAction="#visionHandler" prefHeight="31.0" prefWidth="185.0" text="Get Tags from Google Vision">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>

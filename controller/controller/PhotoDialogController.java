@@ -1,14 +1,30 @@
 package controller;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Optional;
+import java.util.Scanner;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import googleVision.AnnotateImageResponse;
+import googleVision.EntityAnnotation;
+import googleVision.VisionAPIResponse;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
@@ -17,6 +33,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
@@ -24,6 +41,8 @@ import javafx.stage.WindowEvent;
 import model.Album;
 import model.Photo;
 import model.Tags;
+
+
 
 public class PhotoDialogController {
 
@@ -41,6 +60,8 @@ public class PhotoDialogController {
 	private Boolean deleted = false;
 	private ArrayList<Tags> tags;
 	public ObservableList<Tags> observableTags;
+	
+	private static final String TARGET_URL = "https://vision.googleapis.com/v1/images:annotate?key=AIzaSyBQSaazsdwWyhQdrAlP2qxr7h9AshzYpAo";
 	
 	/**
 	 * Sets the current album.
@@ -104,25 +125,17 @@ public class PhotoDialogController {
 		
 		//set stage
         this.dialogStage = dialogStage;
-        
+        /*
         this.dialogStage.setOnCloseRequest(new EventHandler <WindowEvent>(){
 
 			@Override
 			public void handle(WindowEvent event) {
-				
-				//gets users confirmation if they do not want to save
-				Alert alert = new Alert(AlertType.CONFIRMATION);
-				alert.setTitle("Are You Sure?");
-				alert.setHeaderText("Save?");
-				alert.setContentText("Do you want to save current changes?");
 
-				Optional<ButtonType> result = alert.showAndWait();
-				if (result.get() == ButtonType.OK){
-					saveButtonHandler();
-				}
+				//on close, save
+				saveButtonHandler();
 				
 			}
-        });
+        });*/
         
         //set up vbox title
         Label title = new Label("Tags Added :");
@@ -182,13 +195,12 @@ public class PhotoDialogController {
 		
 		//create new tag object
 		Tags newTag = new Tags(tagType, tagVal);
-		
+
 		//add tag to photoobject's tag list
 		this.photo.addTag(newTag);
-		
+	
 		//update the visible listview
 		observableTags.add(newTag);
-
 		//refresh the text fields
 		tagValField.setText("");
 		tagTypeField.setText("");
@@ -285,4 +297,122 @@ public class PhotoDialogController {
 	}
 	
 	
+	@FXML 
+	public void visionHandler() throws IOException{
+		
+		//get the current image and get its byteImg
+		byte[] byteImg = Files.readAllBytes(new File(photo.getPath()).toPath());
+
+		//encode byteImg to a base64 string
+		String base64Image = Base64.getEncoder().encodeToString(byteImg);
+		
+		
+		//create the http connection with the target url
+		URL serverUrl = new URL(TARGET_URL);
+		URLConnection urlConnection = serverUrl.openConnection();
+		HttpURLConnection httpConnection = (HttpURLConnection)urlConnection;
+		
+		//set up the post request
+		httpConnection.setDoOutput(true);
+		httpConnection.setRequestMethod("POST");
+		
+		httpConnection.setRequestProperty("Content-Type", "application/json");
+		
+		//write the post messgae body
+		BufferedWriter httpRequestBodyWriter = new BufferedWriter(new OutputStreamWriter(httpConnection.getOutputStream()));
+		httpRequestBodyWriter.write("{\"requests\":  [{ \"features\":  [ {\"type\": \"LABEL_DETECTION\""
+		   +"}], \"image\": {\"content\":\""+ base64Image +"\"}}]}");
+		 
+
+			
+		//httpRequestBodyWriter.write("{\"foo\":\"bar\"}");
+		httpRequestBodyWriter.close();
+		
+		//Error with Connection
+		if (httpConnection.getInputStream() == null) {
+			//Connection Error
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("Connection Error");
+			alert.setHeaderText("Connection Error");
+			alert.setContentText("Currently unable to connect to google vision api. Cannot get tags.");
+			alert.showAndWait();
+			System.out.println("No stream");
+			return;
+		}
+		
+		//get the response data
+		Scanner httpResponseScanner = new Scanner(httpConnection.getInputStream());
+		String resp = "";
+		while (httpResponseScanner.hasNext()) {
+			String line = httpResponseScanner.nextLine();
+			resp += line;
+		}
+		
+		httpResponseScanner.close();
+		
+		//use gson to get parse json data
+		Gson gson = new GsonBuilder().create();
+        VisionAPIResponse json = (VisionAPIResponse)gson.fromJson(resp, VisionAPIResponse.class);
+       
+		
+        //if null... no tags were returned.
+        if (json == null)  {
+        	//Connection Error
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("No tags.");
+			alert.setHeaderText("No tags.");
+			alert.setContentText("The Google Vision API was not able to create any tags for this picture.");
+			alert.showAndWait();
+			
+			return;
+        }
+
+        //this array will hold all google results
+        ArrayList<Tags> googleResults = new ArrayList<Tags>();
+        
+        AnnotateImageResponse[] annotations= json.getResponses();
+        
+        //navigate through googles responses
+        for (AnnotateImageResponse entities : annotations) {
+        	for (EntityAnnotation entityAnnotation : entities.getLabelAnnotations()) {
+        		
+        		//create a tag from these and add to result list
+        		Tags googleTag = new Tags("GoogleVision", entityAnnotation.getDescription());
+        		googleResults.add(googleTag);
+			}
+		}
+        
+        //create a vbox with all the tags and set it in alert
+        VBox googleTagVbox = new VBox();
+        
+        googleTagVbox.getChildren().add(new Label("Google generated tags : "));
+        googleTagVbox.getChildren().add(new Label());
+        
+        for(Tags tag : googleResults){
+        	googleTagVbox.getChildren().add(new Label("\"" + tag.getVal() + "\""));
+        }
+        
+        googleTagVbox.setAlignment(Pos.CENTER);
+       
+        //ask if they want to add the tags to their list of tags
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+    	alert.setTitle("Generate Tags");
+    	alert.setHeaderText("Do you want to ADD these tags generated by google?");
+    	alert.setGraphic(googleTagVbox);
+
+    	
+    	Optional<ButtonType> result = alert.showAndWait();
+    	if (result.get() == ButtonType.OK){
+    		
+    		//go through each tag and see if it alrady exists in tag list... If not add them
+    		for(Tags tag : googleResults){
+
+    			observableTags.add(tag);
+    			this.photo.addTag(tag);
+
+            }
+            
+    	}
+        
+	}
 }
