@@ -86,7 +86,7 @@ public class LoginController {
 			
 			//go through db array to see if it contains a user with the given username
 			while(count < this.db.size()){
-				
+				f
 				//check
 				if( this.db.get(count).getName().equals(username)){
 					

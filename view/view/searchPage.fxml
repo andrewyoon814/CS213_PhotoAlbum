@@ -14,16 +14,19 @@
             <Font size="43.0" />
          </font>
       </Label>
-      <Button layoutX="244.0" layoutY="597.0" mnemonicParsing="false" onAction="#dateSearchButtonHandler" prefHeight="31.0" prefWidth="164.0" text="By Date Range" />
-      <Button layoutX="844.0" layoutY="597.0" mnemonicParsing="false" onAction="#tagSearchButtonHandler" prefHeight="31.0" prefWidth="164.0" text="By Tag Type" />
+      <Button layoutX="163.0" layoutY="597.0" mnemonicParsing="false" onAction="#dateSearchButtonHandler" prefHeight="31.0" prefWidth="164.0" text="By Date Range" />
+      <Button layoutX="543.0" layoutY="597.0" mnemonicParsing="false" onAction="#tagSearchButtonHandler" prefHeight="31.0" prefWidth="164.0" text="By Tag Type" />
       <Button layoutX="559.0" layoutY="705.0" mnemonicParsing="false" onAction="#goHomeHandler" text="Go Back">
          <font>
             <Font size="27.0" />
          </font>
       </Button>
-      <ListView fx:id="tagList" layoutX="774.0" layoutY="221.0" prefHeight="321.0" prefWidth="305.0" />
-      <Label layoutX="781.0" layoutY="542.0" prefHeight="57.0" prefWidth="291.0" text="Hold 'CTRL' to select multiple tags at once!" textAlignment="CENTER" />
-      <DatePicker fx:id="fromDatePicker" layoutX="174.0" layoutY="221.0" prefHeight="31.0" prefWidth="305.0" promptText="From..." />
-      <DatePicker fx:id="toDatePicker" layoutX="174.0" layoutY="511.0" prefHeight="31.0" prefWidth="305.0" promptText="To..." />
+      <ListView fx:id="tagList" layoutX="473.0" layoutY="221.0" prefHeight="321.0" prefWidth="305.0" />
+      <Label layoutX="480.0" layoutY="542.0" prefHeight="57.0" prefWidth="291.0" text="Hold 'CTRL' to select multiple tags at once!" textAlignment="CENTER" />
+      <DatePicker fx:id="fromDatePicker" layoutX="92.0" layoutY="221.0" prefHeight="31.0" prefWidth="305.0" promptText="From..." />
+      <DatePicker fx:id="toDatePicker" layoutX="92.0" layoutY="501.0" prefHeight="31.0" prefWidth="305.0" promptText="To..." />
+      <Button layoutX="928.0" layoutY="597.0" mnemonicParsing="false" onAction="#tagSearchButtonHandler" prefHeight="31.0" prefWidth="164.0" text="By Tag Value" />
+      <ListView fx:id="tagList1" layoutX="858.0" layoutY="221.0" prefHeight="321.0" prefWidth="305.0" />
+      <Label layoutX="865.0" layoutY="542.0" prefHeight="57.0" prefWidth="291.0" text="Hold 'CTRL' to select multiple tags at once!" textAlignment="CENTER" />
    </children>
 </AnchorPane>
